@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+    android:name="Number"
+    android:summary="Введите номер телефона доверенного лица"
+    android:inputType="phone"
+    android:title="Номер телефона"
+    android:key="PhoneNumberPref" />
+    <EditTextPreference
+        android:name="Bluetooth ID"
+        android:summary="Это ID подключенного устройства"
+        android:title="Bluetooth ID"
+        android:key="bluetoothId" />
+
+</PreferenceScreen>
