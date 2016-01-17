@@ -142,7 +142,8 @@ public class MainActivity extends Activity {
 //
 //        dbHelper.close();
         if ((CheckLocation(getApplicationContext())==true) && (isConnect(getApplicationContext())==true)) {
-            sendGpsLocation();
+           // sendGpsLocation();
+            SMSProvider.smsSend(this,PhoneTextPreference);
         } else{
             Toast.makeText(getApplicationContext(),"Проверьте включен ли GPS и Интернет",Toast.LENGTH_LONG).show();
 
@@ -167,20 +168,9 @@ public class MainActivity extends Activity {
         LocationService.init(this);
         getPrefs();
         epil = (Button)findViewById(R.id.epilepticBtn);
-      //  address = BluetoothActivity.MAC;
         address = bluetoothIdPreference;
         dbHelper = new DBHelper(this);
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                isConnect(getApplicationContext());
-//                CheckLocation(getApplicationContext());
-//            }
-//        }).start();
-//        Cheker = new Handler(){
-//
-//        };
-        btAdapter=BluetoothAdapter.getDefaultAdapter();
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
         isConnect(this);
         CheckLocation(this);
 //
@@ -227,7 +217,9 @@ public class MainActivity extends Activity {
                     for (int i=0;i<=msg.arg1;i++) {
                         if (readBuf[i]==49) {
                             if ((CheckLocation(getApplicationContext())==true) &&(isConnect(getApplicationContext())==true)) {
-                                sendGpsLocation();
+                             //   sendGpsLocation();
+                                SMSProvider.smsSend(getApplicationContext(),PhoneTextPreference);
+
                             } else{
                                 Toast.makeText(getApplicationContext(),"Проверьте включен ли GPS и Интернет",Toast.LENGTH_LONG).show();
                                 break;
@@ -383,17 +375,14 @@ public class MainActivity extends Activity {
         final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             Toast.makeText(ctx,"Передача данных включена",Toast.LENGTH_LONG).show();
-           // epil.setEnabled(true);
             return true;
 
         } else {
-    //        epil.setEnabled(false);
             Toast.makeText(ctx,"Передача данных выключена.Пожалуйста включите ее",Toast.LENGTH_LONG).show();
             return false;
         }
     }
     public boolean CheckLocation(Context context){
-        // location.isProviderEnabled()
         LocationManager location = (LocationManager)
                 context.getSystemService(Context.LOCATION_SERVICE);
         if(location.isProviderEnabled(LocationManager.GPS_PROVIDER)){
@@ -404,72 +393,72 @@ public class MainActivity extends Activity {
             return false;
         }
     }
-    public void sendGpsLocation(){
-        class RetrieveShortUrl extends AsyncTask<String, Void, String> {
-
-            protected String doInBackground(String... urls) {
-                try {
-                    URI longUri = new URI(urls[0]);
-                    UrlShortener shortener = UrlShorteners.googleUrlShortener("AIzaSyCoLv1XiRLxNUYhxFwyjK7USK0kQHU1-DY");
-                    URI shortUrl = shortener.shorten(longUri);
-                    return shortUrl.toString();
-                } catch (Exception e) {}
-                return null;
-            }
-
-            protected void onPostExecute(String shortUrl) {
-                try {
-                    SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(PhoneTextPreference, null, shortUrl, null, null);
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "SMS отправлено!",
-                            Toast.LENGTH_LONG
-                    ).show();
-                }
-                catch (Exception e) {
-                    Toast.makeText(
-                            getApplicationContext(),
-                            "Не удалось отправить SMS!",
-                            Toast.LENGTH_LONG
-                    ).show();
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        double latitude = LocationService.mLastLocation.getLatitude();
-        double longitude = LocationService.mLastLocation.getLongitude();
-
-        String longUrl = String.format(
-                "http://maps.google.com/maps/?q=loc:%s,%s",
-                Double.valueOf(latitude).toString(),
-                Double.valueOf(longitude).toString()
-        );
-
-        RetrieveShortUrl task = new RetrieveShortUrl();
-        task.execute(longUrl);
-
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
-        String year = yearFormat.format(new Date(System.currentTimeMillis()));
-        String epilepticMsg = "Эпилептический приступ";
-        SimpleDateFormat monthFormat = new SimpleDateFormat("dd.MM");
-        String month = monthFormat.format(new Date(System.currentTimeMillis()));
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        String time = timeFormat.format(new Date(System.currentTimeMillis()));
-
-        cv.put("time", time);
-        cv.put("month", month);
-        cv.put("year", year);
-        cv.put("epileptic", epilepticMsg);
-        cv.put("longitude", longitude);
-        cv.put("latitude", latitude);
-        db.insert("statistic", null, cv);
-
-        dbHelper.close();
-    }
+//    public void sendGpsLocation(){
+//        class RetrieveShortUrl extends AsyncTask<String, Void, String> {
+//
+//            protected String doInBackground(String... urls) {
+//                try {
+//                    URI longUri = new URI(urls[0]);
+//                    UrlShortener shortener = UrlShorteners.googleUrlShortener("AIzaSyCoLv1XiRLxNUYhxFwyjK7USK0kQHU1-DY");
+//                    URI shortUrl = shortener.shorten(longUri);
+//                    return shortUrl.toString();
+//                } catch (Exception e) {}
+//                return null;
+//            }
+//
+//            protected void onPostExecute(String shortUrl) {
+//                try {
+//                    SmsManager smsManager = SmsManager.getDefault();
+//                    smsManager.sendTextMessage(PhoneTextPreference, null, shortUrl, null, null);
+//                    Toast.makeText(
+//                            getApplicationContext(),
+//                            "SMS отправлено!",
+//                            Toast.LENGTH_LONG
+//                    ).show();
+//                }
+//                catch (Exception e) {
+//                    Toast.makeText(
+//                            getApplicationContext(),
+//                            "Не удалось отправить SMS!",
+//                            Toast.LENGTH_LONG
+//                    ).show();
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//
+//        double latitude = LocationService.mLastLocation.getLatitude();
+//        double longitude = LocationService.mLastLocation.getLongitude();
+//
+//        String longUrl = String.format(
+//                "http://maps.google.com/maps/?q=loc:%s,%s",
+//                Double.valueOf(latitude).toString(),
+//                Double.valueOf(longitude).toString()
+//        );
+//
+//        RetrieveShortUrl task = new RetrieveShortUrl();
+//        task.execute(longUrl);
+//
+//        SQLiteDatabase db = dbHelper.getWritableDatabase();
+//        ContentValues cv = new ContentValues();
+//        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+//        String year = yearFormat.format(new Date(System.currentTimeMillis()));
+//        String epilepticMsg = "Эпилептический приступ";
+//        SimpleDateFormat monthFormat = new SimpleDateFormat("dd.MM");
+//        String month = monthFormat.format(new Date(System.currentTimeMillis()));
+//        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+//        String time = timeFormat.format(new Date(System.currentTimeMillis()));
+//
+//        cv.put("time", time);
+//        cv.put("month", month);
+//        cv.put("year", year);
+//        cv.put("epileptic", epilepticMsg);
+//        cv.put("longitude", longitude);
+//        cv.put("latitude", latitude);
+//        db.insert("statistic", null, cv);
+//
+//        dbHelper.close();
+//    }
     private class ConnectedThread extends Thread {
 
         private final BluetoothSocket mmSocket;
@@ -488,13 +477,13 @@ public class MainActivity extends Activity {
             mmOutStream = tmpOut;
         }
         public void run() {
-            byte[] buffer = new byte[256]; // buffer store for the stream
-            int bytes; // bytes returned from read()
+            byte[] buffer = new byte[256];
+            int bytes;
 
             while (true) {
                 try {
                     bytes = mmInStream.read(buffer);
-                    h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget(); // Отправляем в очередь сообщений Handler
+                    h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     break;
                 }

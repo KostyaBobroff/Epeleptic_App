@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +18,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import java.io.IOException;
 import java.util.UUID;
 
 
@@ -51,7 +54,7 @@ public class  BluetoothActivity extends Activity {
 
         adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1);
         BtAdapters.setAdapter(adapter);
-        bluetoothAdapter=MainActivity.btAdapter;
+        bluetoothAdapter = MainActivity.btAdapter;
      //   bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
      //   MainActivity.btAdapter = bluetoothAdapter;
         BtAdapters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -88,8 +91,6 @@ public class  BluetoothActivity extends Activity {
                     startActivityForResult(enableBluetoothIntent, ENABLE_BT_REQUEST_CODE);
                 } else {
                     Toast.makeText(getApplicationContext(), "Ваше устройство уже было включено."
-                           // +
-                             //       "\n" + "Scanning for remote Bluetooth devices...",
                             ,Toast.LENGTH_SHORT).show();
                     discoverDevices();
                     makeDiscoverable();
